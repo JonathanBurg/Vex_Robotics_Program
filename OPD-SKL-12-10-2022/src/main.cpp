@@ -153,7 +153,7 @@ void shoot() {
 // these help with auton
 // these do things such as driving the whole bot forward or left or whatever the
 // name says. its a ton easier than typing more than neccessary
-//1 turn ~= 6-7"
+// 1 turn ~= 6-7"
 void SidesFWD() {
 
   LeftSideFWD();
@@ -349,7 +349,7 @@ void autonomous(void) {
     Rv = 45;
     Lv = 45;
     SidesFWD();
-    waitUntil(RotationR.position(turns) >= .5);
+    waitUntil(RotationR.position(turns) >= .3);
     SidesSTP();
     Lv = 75;
     Rv = 75;
@@ -379,29 +379,32 @@ void autonomous(void) {
     Rv = 45;
     Lv = 45;
     SidesREV();
-    waitUntil(RotationR.position(turns) <= -.5);
+    waitUntil(RotationR.position(turns) <= -.3);
 
-    RightSideREV();
-    waitUntil(RotationR.position(turns) <= -2.16);
+    RotationR.setPosition(0, turns);
+    RotationL.setPosition(0, turns);
+
+    LeftSideFWD();
+    waitUntil(RotationR.position(turns) >= 2.16);
     SidesSTP();
 
     RotationR.setPosition(0, turns);
     RotationL.setPosition(0, turns);
     sleep(100);
-
-    if (RotationR.position(turns) > 2.26) {
+    // End of left side competition auton
+    if (RotationL.position(turns) > 2.26) {
       Lv = 25;
       Rv = 25;
-      RightSideREV();
-      waitUntil(RotationR.position(turns) == 2.16);
+      LeftSideREV();
+      waitUntil(RotationL.position(turns) == 2.16);
       SidesSTP();
     }
 
-    if (RotationR.position(turns) < 1.84) {
+    if (RotationL.position(turns) < 1.84) {
       Lv = 25;
       Rv = 25;
-      RightSideFWD();
-      waitUntil(RotationR.position(turns) == 2.16);
+      LeftSideFWD();
+      waitUntil(RotationL.position(turns) == 2.16);
       SidesSTP();
     }
 
@@ -410,51 +413,42 @@ void autonomous(void) {
 
     Lv = 75;
     Rv = 75;
+    /*
+        SidesREV();
+        waitUntil(RotationR.position(turns) <= -5.5);
+        Lv = 60;
+        Rv = 60;
+        waitUntil(RotationR.position(turns) <= -6);
+        Lv = 40;
+        Rv = 40;
+        waitUntil(RotationR.position(turns) <= -6.5);
+        SidesSTP();
 
-    SidesREV();
-    waitUntil(RotationR.position(turns) <= -5.5);
-    Lv = 60;
-    Rv = 60;
-    waitUntil(RotationR.position(turns) <= -6);
-    Lv = 40;
-    Rv = 40;
-    waitUntil(RotationR.position(turns) <= -6.5);
-    SidesSTP();
+        if (RotationR.position(turns) < -6.6) {
+          Lv = 25;
+          Rv = 25;
+          SidesREV();
+          waitUntil(RotationR.position(turns) == -6.5);
+          SidesSTP();
+        }
 
-    if (RotationR.position(turns) < -6.6) {
-      Lv = 25;
-      Rv = 25;
-      SidesREV();
-      waitUntil(RotationR.position(turns) == -6.5);
-      SidesSTP();
-    }
+        if (RotationR.position(turns) > -6.4) {
+          Lv = 25;
+          Rv = 25;
+          SidesFWD();
+          waitUntil(RotationR.position(turns) == -6.5);
+          SidesSTP();
+        }
+        SidesSTP();
+        sleep(100);
 
-    if (RotationR.position(turns) > -6.4) {
-      Lv = 25;
-      Rv = 25;
-      SidesFWD();
-      waitUntil(RotationR.position(turns) == -6.5);
-      SidesSTP();
-    }
-    SidesSTP();
-    sleep(100);
+        RotationR.setPosition(0, turns);
+        RotationL.setPosition(0, turns);
 
-    RotationR.setPosition(0, turns);
-    RotationL.setPosition(0, turns);
-
-    Rv=40;
-    Lv=40;
-    RightSideREV();
-    /*RightSideREV();
-    waitUntil(RotationR.position(turns) <= -.1);
-    Lv = 60;
-    Rv = 60;
-    waitUntil(RotationR.position(turns) <= -.6);
-    Lv = 50;
-    Rv = 50;
-    waitUntil(RotationR.position(turns) <= -1);
-    SidesSTP();*/
-
+        Rv = 40;
+        Lv = 40;
+        RightSideREV();
+        */
     RotationR.setPosition(0, turns);
     RotationL.setPosition(0, turns);
 

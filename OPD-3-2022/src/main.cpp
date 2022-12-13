@@ -349,7 +349,7 @@ void autonomous(void) {
     Rv = 45;
     Lv = 45;
     SidesFWD();
-    waitUntil(RotationR.position(turns) >= .4);
+    waitUntil(RotationR.position(turns) >= .3);
     SidesSTP();
     Lv = 75;
     Rv = 75;
