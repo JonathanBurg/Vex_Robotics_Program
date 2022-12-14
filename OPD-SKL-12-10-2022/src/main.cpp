@@ -106,6 +106,7 @@ void controller1Screen() {
   Controller1.Screen.newLine();
   Controller1.Screen.print("LS %: "); // left side temp in percent
   Controller1.Screen.print(LT);
+  Controller1.Screen.print("RGB:", VisionBOI.hue());
 }
 
 int Rv = 100;
@@ -232,6 +233,7 @@ void pre_auton(void) { vexcodeInit(); }
 
 void autonomous(void) {
   while (true) {
+    double distance = 0;
     RotationR.setPosition(0, turns);
     RotationL.setPosition(0, turns);
     Lv = 75;
@@ -242,12 +244,16 @@ void autonomous(void) {
     waitUntil(DistanceBOI.objectDistance(inches) <= 4);
     SidesSTP();
 
+    RotationR.setPosition(0, turns);
+    RotationL.setPosition(0, turns);
+    sleep(100);
+
     Intake.spin(reverse, 100, pct);
-    wait(.25, sec);
+    wait(.4, sec);
     Intake.stop(coast);
 
-    SidesREV();
-    wait(.2, sec);
+    SidesREV(); // Rotate first roller
+    waitUntil(RotationR.position(turns) <= -0.4);
     SidesSTP();
     sleep(100);
 
@@ -255,108 +261,59 @@ void autonomous(void) {
     RotationL.setPosition(0, turns);
     sleep(100);
 
+    distance = -1.73; // turn around to face goal
     RightSideREV();
-    waitUntil(RotationR.position(turns) <= -.8);
+    waitUntil(RotationR.position(turns) <= distance);
     SidesSTP();
 
-    if (RotationR.position(turns) < -.9) {
+    if (RotationR.position(turns) < distance - 0.1) {
       Lv = 15;
       Rv = 15;
       LeftSideREV();
-      waitUntil(RotationR.position(turns) == -.8);
+      waitUntil(RotationR.position(turns) == distance);
       SidesSTP();
     }
 
-    if (RotationR.position(turns) > -.7) {
+    if (RotationR.position(turns) > distance + 0.1) {
       Lv = 25;
       Rv = 25;
       RightSideREV();
-      waitUntil(RotationR.position(turns) == -.8);
+      waitUntil(RotationR.position(turns) == distance);
       SidesSTP();
     }
-
-    Lv = 75;
-    Rv = 75;
-
-    RotationR.setPosition(0, turns);
-    RotationL.setPosition(0, turns);
-    sleep(100);
-    // at this point the cylinder has been spun and we should be parallel with
-    // the white lines (WORKING)
-
-    SidesREV();
-    waitUntil(RotationR.position(turns) <= -5.5);
-    Lv = 60;
-    Rv = 60;
-    waitUntil(RotationR.position(turns) <= -6);
-    Lv = 40;
-    Rv = 40;
-    waitUntil(RotationR.position(turns) <= -6.5);
-    SidesSTP();
-
-    if (RotationR.position(turns) < -6.6) {
-      Lv = 25;
-      Rv = 25;
-      SidesREV();
-      waitUntil(RotationR.position(turns) == -6.5);
-      SidesSTP();
-    }
-
-    if (RotationR.position(turns) > -6.4) {
-      Lv = 25;
-      Rv = 25;
-      SidesFWD();
-      waitUntil(RotationR.position(turns) == -6.5);
-      SidesSTP();
-    }
-
-    Lv = 75;
-    Rv = 75;
 
     RotationR.setPosition(0, turns);
     RotationL.setPosition(0, turns);
     sleep(100);
 
-    RightSideREV();
-    waitUntil(RotationR.position(turns) <= -2.16);
+    distance = 1.73;
+    LeftSideFWD();
+    waitUntil(RotationL.position(turns) >= distance);
     SidesSTP();
 
-    if (RotationR.position(turns) < -2.26) {
-      Lv = 25;
-      Rv = 25;
+    if (RotationL.position(turns) > distance + .1) {
+      Lv = 15;
+      Rv = 15;
       RightSideFWD();
-      waitUntil(RotationR.position(turns) == -2.16);
+      waitUntil(RotationL.position(turns) == distance);
       SidesSTP();
     }
 
-    if (RotationR.position(turns) > -1.84) {
+    if (RotationL.position(turns) < distance - .1) {
       Lv = 25;
       Rv = 25;
-      RightSideREV();
-      waitUntil(RotationR.position(turns) == -2.16);
+      LeftSideFWD();
+      waitUntil(RotationL.position(turns) == distance);
       SidesSTP();
     }
-
-    Lv = 75;
-    Rv = 75;
-
-    // parallel with line(WORKING)
 
     RotationR.setPosition(0, turns);
     RotationL.setPosition(0, turns);
-
-    sleep(100);
-    Rv = 45;
-    Lv = 45;
-    SidesFWD();
-    waitUntil(RotationR.position(turns) >= .3);
     SidesSTP();
-    Lv = 75;
-    Rv = 75;
 
     waitUntil(Rotation3.velocity(rpm) >= 2250);
 
-    // is looking at the goal at other end of field (WORKING)
+    // is looking at the goal at other end of field (working)
     OutakeYeet.open();
     wait(.25, sec);
     OutakeYeet.close();
@@ -368,52 +325,46 @@ void autonomous(void) {
     wait(.5, sec);
     outtake1.stop(coast);
 
-    // has shot 2 disks into the top goal (WORKING)
-
     RotationR.setPosition(0, turns);
     RotationL.setPosition(0, turns);
     sleep(100);
 
-    // Go back and turn left to line back up with line
-
-    Rv = 45;
-    Lv = 45;
-    SidesREV();
-    waitUntil(RotationR.position(turns) <= -.3);
-
-    RotationR.setPosition(0, turns);
-    RotationL.setPosition(0, turns);
-
+    distance = -1.73;
     LeftSideFWD();
-    waitUntil(RotationR.position(turns) >= 2.16);
+    waitUntil(RotationL.position(turns) <= distance);
     SidesSTP();
 
-    RotationR.setPosition(0, turns);
-    RotationL.setPosition(0, turns);
-    sleep(100);
-    // End of left side competition auton
-    if (RotationL.position(turns) > 2.26) {
-      Lv = 25;
-      Rv = 25;
-      LeftSideREV();
-      waitUntil(RotationL.position(turns) == 2.16);
+    if (RotationL.position(turns) < distance - .1) {
+      Lv = 15;
+      Rv = 15;
+      RightSideFWD();
+      waitUntil(RotationL.position(turns) == distance);
       SidesSTP();
     }
 
-    if (RotationL.position(turns) < 1.84) {
+    if (RotationL.position(turns) > distance + .1) {
       Lv = 25;
       Rv = 25;
       LeftSideFWD();
-      waitUntil(RotationL.position(turns) == 2.16);
+      waitUntil(RotationL.position(turns) == distance);
       SidesSTP();
     }
 
     RotationR.setPosition(0, turns);
     RotationL.setPosition(0, turns);
-
-    Lv = 75;
-    Rv = 75;
+    sleep(100);
+    
     /*
+        Lv = 75;
+        Rv = 75;
+
+        RotationR.setPosition(0, turns);
+        RotationL.setPosition(0, turns);
+        sleep(100);
+        // at this point the cylinder has been spun and we should be parallel
+       with
+        // the white lines (WORKING)
+
         SidesREV();
         waitUntil(RotationR.position(turns) <= -5.5);
         Lv = 60;
@@ -439,16 +390,146 @@ void autonomous(void) {
           waitUntil(RotationR.position(turns) == -6.5);
           SidesSTP();
         }
-        SidesSTP();
+
+        Lv = 75;
+        Rv = 75;
+
+        RotationR.setPosition(0, turns);
+        RotationL.setPosition(0, turns);
         sleep(100);
+
+        RightSideREV();
+        waitUntil(RotationR.position(turns) <= -2.16);
+        SidesSTP();
+
+        if (RotationR.position(turns) < -2.26) {
+          Lv = 25;
+          Rv = 25;
+          RightSideFWD();
+          waitUntil(RotationR.position(turns) == -2.16);
+          SidesSTP();
+        }
+
+        if (RotationR.position(turns) > -1.84) {
+          Lv = 25;
+          Rv = 25;
+          RightSideREV();
+          waitUntil(RotationR.position(turns) == -2.16);
+          SidesSTP();
+        }
+
+        Lv = 75;
+        Rv = 75;
+
+        // parallel with line(WORKING)
 
         RotationR.setPosition(0, turns);
         RotationL.setPosition(0, turns);
 
-        Rv = 40;
-        Lv = 40;
-        RightSideREV();
-        */
+        sleep(100);
+        Rv = 45;
+        Lv = 45;
+        SidesFWD();
+        waitUntil(RotationR.position(turns) >= .3);
+        SidesSTP();
+        Lv = 75;
+        Rv = 75;
+
+        waitUntil(Rotation3.velocity(rpm) >= 2250);
+
+        // is looking at the goal at other end of field (WORKING)
+        OutakeYeet.open();
+        wait(.25, sec);
+        OutakeYeet.close();
+        waitUntil(Rotation3.velocity(rpm) >= 2250);
+        sleep(100);
+        OutakeYeet.open();
+        wait(.25, sec);
+        OutakeYeet.close();
+        wait(.5, sec);
+        outtake1.stop(coast);
+
+        // has shot 2 disks into the top goal (WORKING)
+
+        RotationR.setPosition(0, turns);
+        RotationL.setPosition(0, turns);
+        sleep(100);
+
+        // Go back and turn left to line back up with line
+
+        Rv = 45;
+        Lv = 45;
+        SidesREV();
+        waitUntil(RotationR.position(turns) <= -.3);
+
+        RotationR.setPosition(0, turns);
+        RotationL.setPosition(0, turns);
+
+        LeftSideFWD();
+        waitUntil(RotationR.position(turns) >= 2.16);
+        SidesSTP();
+
+        RotationR.setPosition(0, turns);
+        RotationL.setPosition(0, turns);
+        sleep(100);
+        // End of left side competition auton
+        if (RotationL.position(turns) > 2.26) {
+          Lv = 25;
+          Rv = 25;
+          LeftSideREV();
+          waitUntil(RotationL.position(turns) == 2.16);
+          SidesSTP();
+        }
+
+        if (RotationL.position(turns) < 1.84) {
+          Lv = 25;
+          Rv = 25;
+          LeftSideFWD();
+          waitUntil(RotationL.position(turns) == 2.16);
+          SidesSTP();
+        }
+
+        RotationR.setPosition(0, turns);
+        RotationL.setPosition(0, turns);
+
+        Lv = 75;
+        Rv = 75;
+        /*
+            SidesREV();
+            waitUntil(RotationR.position(turns) <= -5.5);
+            Lv = 60;
+            Rv = 60;
+            waitUntil(RotationR.position(turns) <= -6);
+            Lv = 40;
+            Rv = 40;
+            waitUntil(RotationR.position(turns) <= -6.5);
+            SidesSTP();
+
+            if (RotationR.position(turns) < -6.6) {
+              Lv = 25;
+              Rv = 25;
+              SidesREV();
+              waitUntil(RotationR.position(turns) == -6.5);
+              SidesSTP();
+            }
+
+            if (RotationR.position(turns) > -6.4) {
+              Lv = 25;
+              Rv = 25;
+              SidesFWD();
+              waitUntil(RotationR.position(turns) == -6.5);
+              SidesSTP();
+            }
+            SidesSTP();
+            sleep(100);
+
+            RotationR.setPosition(0, turns);
+            RotationL.setPosition(0, turns);
+
+            Rv = 40;
+            Lv = 40;
+            RightSideREV();
+            */
     RotationR.setPosition(0, turns);
     RotationL.setPosition(0, turns);
 
