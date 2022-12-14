@@ -353,7 +353,7 @@ void autonomous(void) {
     RotationR.setPosition(0, turns);
     RotationL.setPosition(0, turns);
     sleep(100);
-    
+
     /*
         Lv = 75;
         Rv = 75;
@@ -494,7 +494,7 @@ void autonomous(void) {
 
         Lv = 75;
         Rv = 75;
-        /*
+
             SidesREV();
             waitUntil(RotationR.position(turns) <= -5.5);
             Lv = 60;
