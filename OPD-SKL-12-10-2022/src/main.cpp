@@ -233,6 +233,7 @@ void pre_auton(void) { vexcodeInit(); }
 
 void autonomous(void) {
   while (true) {
+    VisionBOI.setLight(ledState::on);
     double distance = 0;
     RotationR.setPosition(0, turns);
     RotationL.setPosition(0, turns);
@@ -248,12 +249,24 @@ void autonomous(void) {
     RotationL.setPosition(0, turns);
     sleep(100);
 
-    Intake.spin(reverse, 100, pct);
-    wait(.4, sec);
-    Intake.stop(coast);
+    // Rotate first roller
+    if (VisionBOI.isNearObject() || VisionBOI.color() == vex::blue) {
+      Intake.spin(reverse, 100, pct);
+      waitUntil(VisionBOI.color() == vex::red);
+      Intake.stop(coast);
 
-    SidesREV(); // Rotate first roller
-    waitUntil(RotationR.position(turns) <= -0.4);
+      if (VisionBOI.hue() < 13 || VisionBOI.hue() > 20) {
+        Intake.spin(reverse, 100, pct);
+        waitUntil(VisionBOI.color() == vex::red);
+        Intake.stop(coast);
+      }
+    }
+    // 13-20=red
+    //>300=blue
+
+    // turn around to face goal on opposite end of field
+    SidesREV();
+    waitUntil(RotationR.position(turns) <= -0.5);
     SidesSTP();
     sleep(100);
 
@@ -261,7 +274,7 @@ void autonomous(void) {
     RotationL.setPosition(0, turns);
     sleep(100);
 
-    distance = -1.73; // turn around to face goal
+    distance = -1.73;
     RightSideREV();
     waitUntil(RotationR.position(turns) <= distance);
     SidesSTP();
@@ -286,7 +299,7 @@ void autonomous(void) {
     RotationL.setPosition(0, turns);
     sleep(100);
 
-    distance = 1.73;
+    distance = 1.72;
     LeftSideFWD();
     waitUntil(RotationL.position(turns) >= distance);
     SidesSTP();
@@ -329,15 +342,16 @@ void autonomous(void) {
     RotationL.setPosition(0, turns);
     sleep(100);
 
-    distance = -1.73;
-    LeftSideFWD();
+    // turn back to go rotate second roller
+    distance = -1.72;
+    LeftSideREV();
     waitUntil(RotationL.position(turns) <= distance);
     SidesSTP();
 
     if (RotationL.position(turns) < distance - .1) {
       Lv = 15;
       Rv = 15;
-      RightSideFWD();
+      RightSideREV();
       waitUntil(RotationL.position(turns) == distance);
       SidesSTP();
     }
@@ -345,7 +359,7 @@ void autonomous(void) {
     if (RotationL.position(turns) > distance + .1) {
       Lv = 25;
       Rv = 25;
-      LeftSideFWD();
+      LeftSideREV();
       waitUntil(RotationL.position(turns) == distance);
       SidesSTP();
     }
